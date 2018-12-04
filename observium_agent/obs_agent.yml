@@ -1,0 +1,37 @@
+---
+- name: Install Observium_agent
+  hosts: all
+  
+  tasks:
+  - name: Install xinetd and update repositories
+    apt: 
+     name: xinetd
+     update_cache: yes
+  
+  - name: Copy xinetd config file
+    copy:
+     src: observium_agent_xinetd
+     dest: /etc/xinetd.d/observium_agent_xinetd
+     owner: root
+     group: root
+     mode: 0755
+  
+  - name: Copy agent
+    copy:
+     src: observium_agent
+     dest: /usr/bin/
+     owner: root
+     group: root
+     mode: 0755
+     
+  - name: Create observium_agents directory
+    file:
+     path: /usr/lib/observium_agent
+     state: directory
+     mode: "u=rwx,g=rx,o=x"
+     
+  - name: Ensure xinetd is running.
+    service: 
+     name: xinetd 
+     state: restarted 
+     enabled: yes

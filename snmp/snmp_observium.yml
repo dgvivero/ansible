@@ -1,0 +1,47 @@
+---
+- hosts: 10.6.100.120
+  
+  
+  tasks:
+  - name: Update repositories cache and install "snmpd" package
+    apt:
+        name: snmpd
+        update_cache: yes
+        
+  - name: Install "ifAlias_persist" package
+    apt:
+        name: libsnmp-extension-passpersist-perl
+        
+  - name: Copy snmpd configure file to client
+    copy: 
+     src: snmpd.conf
+     dest: /etc/snmp
+     owner: root 
+     group: root 
+     mode: 0644 
+    
+  
+  - name: Copy distro file to client
+    copy: 
+     src: /opt/observium/scripts/distro  
+     dest: /usr/bin
+     owner: root 
+     group: root 
+     mode: 0744 
+     force: no
+          
+  - name: Copy ifAlias_persist configure file to client
+    copy: 
+     src: /opt/observium/scripts/ifAlias_persist  
+     dest: /usr/bin/
+     owner: root 
+     group: root 
+     mode: 0744 
+     force: no
+  
+          
+  - name: Ensure snmpd is running.
+    service: 
+     name: snmpd 
+     state: restarted 
+     enabled: yes

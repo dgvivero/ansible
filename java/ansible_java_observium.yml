@@ -1,0 +1,27 @@
+---
+- name: Install Java, and set JAVA_HOME
+  hosts: all
+  
+  tasks:
+  - name: Cheks updates and install java jdk
+    apt:
+     name: default-jdk
+     update_cache: yes
+  
+  - name: print java installation path and old
+    shell: update-alternatives --query java | grep 'Value':' ' | grep -o '/.*/jre'
+    args:
+     executable: /bin/bash
+    register: out
+    
+  - name: Set JAVA_HOME variable
+    lineinfile:
+     path: /etc/profile
+     line: 'export JAVA_HOME={{out.stdout}}'
+  
+     
+  - name: Copy jvm agent
+    copy: src=/opt/observium/scripts/agent-local/jvm-over-jmx dest=observium_agent/local/jvm-over-jmx
+          owner=root group=root mode=0744 force=no 
+      
+  
